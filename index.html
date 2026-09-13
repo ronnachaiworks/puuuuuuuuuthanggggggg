@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ปูทาง — ชุมชนถาม-ตอบของรุ่นพี่รุ่นน้อง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#08291C;
+    --ink-soft:#2A5C41;
+    --violet:#0E6B3B;
+    --violet-soft:#E3F0E6;
+    --gold:#C99A3E;
+    --sage:#4C8F6C;
+    --paper:#FAFAF5;
+    --panel:#FFFFFF;
+    --line:#DFE4D9;
+    --muted:#5A6B5F;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans Thai', sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.wordmark{ font-family:'Kanit', sans-serif; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:1160px; margin:0 auto; padding:0 32px; }
+
+  /* NAV */
+  nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 32px; max-width:1160px; margin:0 auto;
+    background:rgba(251,250,248,0.75); backdrop-filter:blur(10px);
+  }
+  .wordmark{ display:flex; align-items:center; gap:9px; font-size:20px; font-weight:600; color:var(--ink); }
+  .wordmark svg{ width:26px; height:26px; }
+  .nav-links{ display:flex; gap:30px; font-size:14.5px; color:var(--ink-soft); }
+  .nav-links a:hover{ color:var(--violet); }
+  .nav-cta{
+    background:var(--ink); color:#fff; padding:10px 20px;
+    border-radius:100px; font-size:14px; font-weight:500;
+  }
+  .nav-right{ display:flex; align-items:center; gap:12px; position:relative; }
+  .explore-toggle{
+    display:flex; width:38px; height:38px; border-radius:50%; border:1px solid var(--line);
+    background:#fff; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .explore-toggle:hover{ border-color:var(--violet); }
+  .explore-toggle svg{ width:17px; height:17px; stroke:var(--ink-soft); fill:none; }
+
+  .explore-panel{ display:none; }
+  .explore-panel.open{
+    display:block; position:absolute; top:52px; right:0; width:320px;
+    background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px;
+    box-shadow:0 24px 50px -18px rgba(8,41,28,0.22); z-index:60;
+  }
+  .explore-search{
+    display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:10px;
+    padding:9px 12px; margin-bottom:14px;
+  }
+  .explore-search svg{ width:15px; height:15px; stroke:var(--muted); flex-shrink:0; fill:none; }
+  .explore-search input{
+    border:none; outline:none; font-family:'IBM Plex Sans Thai'; font-size:13.5px; width:100%; color:var(--ink);
+  }
+  .explore-label{ font-size:12px; font-weight:600; color:var(--muted); margin-bottom:8px; letter-spacing:0.2px; }
+  .explore-item{ display:flex; gap:10px; padding:9px 4px; border-radius:8px; }
+  .explore-item:hover{ background:var(--violet-soft); }
+  .explore-item .dot{ width:5px; height:5px; border-radius:50%; background:var(--gold); margin-top:7px; flex-shrink:0; }
+  .explore-item .txt{ font-size:13.5px; color:var(--ink); line-height:1.5; }
+  .explore-item .txt .tag{ display:block; font-size:11px; color:var(--violet); font-weight:600; margin-bottom:2px; }
+  .explore-panel-links{ display:none; flex-direction:column; gap:2px; padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid var(--line); }
+  .explore-panel-links a{ padding:9px 6px; border-radius:8px; font-size:14px; color:var(--ink); }
+  .explore-panel-links a:hover{ background:var(--violet-soft); }
+  .live-pill{
+    display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--sage);
+    background:#E7F3EA; padding:4px 12px; border-radius:100px; font-weight:500;
+  }
+  .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--sage); animation:pulse 1.6s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+  /* HERO */
+  .hero{ position:relative; padding:64px 32px 40px; max-width:1160px; margin:0 auto; }
+  .hero::before{
+    content:''; position:absolute; top:-120px; right:-160px; width:520px; height:520px; border-radius:50%;
+    background:radial-gradient(circle, rgba(30,132,73,0.14), transparent 70%); z-index:-1;
+  }
+  .hero-grid{ display:grid; grid-template-columns:1fr 0.95fr; gap:56px; align-items:center; position:relative; }
+  .hero-photo{
+    position:absolute; top:-40px; right:-30px; width:300px; height:380px;
+    background-image:url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=60');
+    background-size:cover; background-position:center; border-radius:28px; z-index:0;
+    mask-image:linear-gradient(135deg, rgba(0,0,0,0.9) 30%, transparent 78%);
+    -webkit-mask-image:linear-gradient(135deg, rgba(0,0,0,0.9) 30%, transparent 78%);
+  }
+  .feed-mock{ position:relative; z-index:1; }
+  h1.headline{ font-size:44px; line-height:1.28; font-weight:600; color:var(--ink); max-width:520px; }
+  h1.headline .accent{ color:var(--violet); }
+  .sub{ margin-top:18px; font-size:16.5px; color:var(--muted); max-width:440px; }
+  .hero-ctas{ display:flex; gap:12px; margin-top:30px; }
+  .btn-primary{ background:var(--violet); color:#fff; padding:14px 26px; border-radius:100px; font-weight:600; font-size:15px; }
+  .btn-ghost{ color:var(--ink); padding:14px 20px; font-weight:500; font-size:15px; border-bottom:1.5px solid var(--ink); }
+
+  /* HERO FEED MOCK */
+  .feed-mock{
+    background:var(--panel); border-radius:20px; padding:20px; border:1px solid var(--line);
+    box-shadow:0 24px 60px -20px rgba(8,41,28,0.18);
+  }
+  .feed-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding:0 4px; }
+  .feed-head strong{ font-size:14px; font-family:'Kanit'; font-weight:600; }
+  .feed-item{ display:flex; gap:12px; padding:14px; border-radius:14px; margin-bottom:8px; }
+  .feed-item.answered{ background:var(--violet-soft); }
+  .feed-item.open{ background:#F2F4EE; }
+  .avatar{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:12px; font-weight:600; font-family:'Kanit';
+  }
+  .feed-item .q{ font-size:13.5px; color:var(--ink); font-weight:500; margin-bottom:3px; }
+  .feed-item .meta{ font-size:12px; color:var(--muted); display:flex; gap:8px; align-items:center; }
+  .tag-chip{ font-size:10.5px; padding:2px 8px; border-radius:100px; background:#fff; color:var(--ink-soft); border:1px solid var(--line); }
+  .status-answered{ font-size:11px; color:var(--sage); font-weight:600; }
+  .status-open{ font-size:11px; color:var(--gold); font-weight:600; }
+
+  /* STATS BAR */
+  .stats{ padding:64px 32px; max-width:1160px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:24px; border-top:1px solid var(--line); }
+  .stat h3{ font-size:30px; color:var(--ink); font-family:'Kanit'; font-weight:600; }
+  .stat p{ font-size:13.5px; color:var(--muted); margin-top:4px; }
+
+  /* AD SLOT — stacked auto-rotating carousel */
+  .ad-slot{ width:min(1224px,100%); max-width:none; margin:0 auto 90px; padding:0 32px; }
+  .ad-label{ font-size:11.5px; color:var(--muted); margin-bottom:8px; font-weight:500; text-align:center; }
+  .ad-carousel{ position:relative; height:215px; }
+  .ad-slide{
+    position:absolute; top:0; left:0; right:0; height:175px;
+    border:1.5px dashed var(--line); border-radius:16px; background:#F2F4EE;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; color:var(--muted);
+    transition:transform 0.7s ease, opacity 0.7s ease;
+  }
+  .ad-slide.pos-0{ transform:translateY(0) scale(1); opacity:1; z-index:3; background:#F2F4EE; }
+  .ad-slide.pos-1{ transform:translateY(20px) scale(0.96); opacity:0.65; z-index:2; background:#EAEEE0; }
+  .ad-slide.pos-2{ transform:translateY(38px) scale(0.92); opacity:0.35; z-index:1; background:#E3E8D6; }
+  .ad-dots{ display:flex; justify-content:center; gap:6px; margin-top:10px; }
+  .ad-dot{ width:6px; height:6px; border-radius:50%; background:var(--line); transition:background 0.3s; }
+  .ad-dot.active{ background:var(--violet); }
+
+  /* PHOTO BAND */
+  .photo-band{ max-width:1160px; margin:0 auto 20px; padding:0 32px; }
+  .photo-row{
+    display:flex; gap:4px; height:260px; border-radius:20px; overflow:hidden;
+    mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    -webkit-mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  }
+  .ph{ flex:1; position:relative; background-size:cover; background-position:center; }
+  .ph::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(8,41,28,0.65), rgba(8,41,28,0) 55%);
+  }
+  .ph .cap{ position:absolute; left:20px; bottom:16px; z-index:1; color:#fff; font-size:14px; font-weight:500; max-width:220px; }
+
+  /* CAMPUS BAR */
+  .campus-bar{ background:var(--violet-soft); }
+  .campus-bar-inner{
+    max-width:1160px; margin:0 auto; padding:9px 32px; display:flex; align-items:center;
+    justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:13px; color:var(--ink-soft);
+  }
+  .campus-bar-inner strong{ color:var(--ink); }
+  /* COMMUNITY SHOWCASE (main sell) */
+  .community{ padding:20px 32px 40px; max-width:1160px; margin:0 auto; }
+  .community-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; flex-wrap:wrap; gap:16px; }
+  .community-head h2{ font-size:34px; font-weight:600; color:var(--ink); max-width:480px; }
+  .community-head p{ font-size:15px; color:var(--muted); max-width:340px; }
+  .filters{ display:flex; gap:8px; margin:28px 0 32px; flex-wrap:wrap; }
+  .filter{ font-size:13.5px; padding:8px 16px; border-radius:100px; border:1px solid var(--line); color:var(--ink-soft); }
+  .filter.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
+
+  .qa-masonry{ columns:2; column-gap:18px; }
+  .qa-card{
+    break-inside:avoid; background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px; margin-bottom:18px;
+  }
+  .qa-card .top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+  .qa-card .faculty{ font-size:12px; color:var(--violet); font-weight:600; }
+  .qa-card .question{ font-size:15.5px; color:var(--ink); font-weight:500; margin-bottom:14px; }
+  .answer-row{ display:flex; gap:10px; }
+  .answer-body{ font-size:14px; color:var(--muted); }
+  .answer-name{ font-size:13px; color:var(--ink); font-weight:600; margin-bottom:3px; }
+  .card-foot{ display:flex; gap:14px; margin-top:14px; font-size:12.5px; color:var(--muted); }
+  .card-foot span{ display:flex; align-items:center; gap:4px; }
+
+  .ask-cta{
+    text-align:center; margin-top:36px; padding:36px; border-radius:20px; background:var(--violet-soft);
+  }
+  .ask-cta h3{ font-size:20px; font-weight:600; color:var(--ink); margin-bottom:8px; }
+  .ask-cta p{ font-size:14.5px; color:var(--ink-soft); margin-bottom:18px; }
+
+  /* MARKETPLACE — compact, secondary */
+  .market{ padding:24px 32px 72px; max-width:1160px; margin:0 auto; }
+  .market-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
+  .market-head h3{ font-size:26px; line-height:1.3; font-weight:600; color:var(--ink); }
+  .market-head a{ font-size:13px; color:var(--violet); font-weight:500; }
+  .market-sub{ font-size:13.5px; color:var(--muted); margin-bottom:18px; }
+
+  .carousel-wrap{ position:relative; }
+  .carousel{
+    display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; padding:3px 2px 10px;
+    scrollbar-width:none;
+    cursor:grab;
+    overscroll-behavior-x:contain;
+  }
+  .carousel:active{ cursor:grabbing; }
+  .carousel::-webkit-scrollbar{ display:none; }
+  .mini-card{
+    flex:0 0 240px; scroll-snap-align:start; background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:15px; font-size:14px;
+  }
+  .mini-thumb{
+    position:relative; height:105px; border-radius:8px; margin-bottom:12px; overflow:hidden;
+    background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:6px 8px;
+  }
+  .mini-thumb::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(8,41,28,0.8), rgba(8,41,28,0) 65%);
+  }
+  .mini-thumb span{ position:relative; z-index:1; color:#fff; font-family:'Kanit'; font-weight:600; font-size:13px; }
+  .mini-card .name{ font-weight:600; color:var(--ink); margin-bottom:2px; font-size:17px; line-height:1.35; min-height:40px; overflow-wrap:anywhere; }
+  .mini-card .who{ color:var(--muted); font-size:13px; margin-bottom:8px; }
+  .mini-card .foot{ display:flex; justify-content:space-between; align-items:center; }
+  .mini-card .price{ font-weight:700; color:var(--ink); font-family:'Kanit'; font-size:18px; }
+  .mini-card .rate{ color:var(--gold); font-size:12px; }
+  .mini-card .btn-small{ display:block; width:100%; min-height:42px; margin-top:11px; padding:9px 10px; border-radius:9px; font-size:14px; }
+  .art-card .btn-small{ min-width:108px; min-height:40px; padding:9px 12px; border-radius:9px; }
+  .carousel-arrows{ display:flex; gap:8px; margin-top:14px; }
+  .arrow-btn{
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:#fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--ink-soft);
+  }
+  .arrow-btn:hover{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  @media (max-width:600px){ .mini-card{ flex-basis:220px; } .mini-thumb{ height:96px; } }
+
+  /* APP INTERACTIONS */
+  button, .clickable{ font:inherit; cursor:pointer; }
+  button{ border:0; }
+  .cart-button{ position:relative; background:#fff; border:1px solid var(--line); width:38px; height:38px; border-radius:50%; color:var(--ink); }
+  .cart-count{ position:absolute; top:-5px; right:-3px; min-width:17px; height:17px; padding:0 4px; border-radius:20px; background:var(--gold); color:#fff; font:11px/17px 'Kanit'; }
+  .dashboard-strip{ display:none; }
+  .dashboard-strip.open{ display:block; }
+  .nav-account-tools{ display:block; position:relative; }
+  .nav-account-tools.open{ display:block; }
+  .account-tools-toggle{ display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--ink-soft); font-size:24px; line-height:1; cursor:pointer; }
+  .account-tools-toggle:disabled{ opacity:.45; cursor:not-allowed; background:#F2F4EE; }
+  .account-tools-toggle:hover,.account-tools-toggle.active{ border-color:var(--violet); color:var(--violet); background:var(--violet-soft); }
+  .nav-subscribe{ border:1px solid var(--gold); background:#FFF9E8; color:#8B681F; padding:9px 13px; border-radius:9px; font-size:12.5px; font-weight:600; white-space:nowrap; }
+  .nav-subscribe:hover{ background:var(--gold); color:#fff; }
+  .account-tools-panel{ display:none; position:absolute; top:46px; right:0; z-index:65; min-width:220px; padding:8px; border:1px solid var(--line); border-radius:13px; background:#fff; box-shadow:0 20px 45px rgba(8,41,28,.16); }
+  .account-tools-panel.open{ display:grid; gap:3px; }
+  .dash-btn{ border:0; text-align:left; background:#fff; color:var(--ink-soft); padding:9px 11px; border-radius:8px; font-size:13px; }
+  .dash-btn:hover{ border-color:var(--violet); color:var(--violet); }
+  .modal-backdrop{ display:none; position:fixed; inset:0; z-index:100; background:rgba(8,41,28,.45); align-items:center; justify-content:center; padding:20px; }
+  .modal-backdrop.open{ display:flex; }
+  .modal{ width:min(100%, 520px); max-height:90vh; overflow:auto; background:var(--paper); border-radius:18px; padding:26px; box-shadow:0 24px 80px rgba(8,41,28,.3); position:relative; }
+  .modal.wide{ width:min(100%, 720px); }
+  .modal.page-modal{ width:min(100%, 1040px); height:min(92vh, 820px); max-height:92vh; padding:32px; }
+  .thread-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+  .thread-search{ flex:1; min-width:220px; border:1px solid var(--line); border-radius:9px; padding:10px 12px; font:13.5px 'IBM Plex Sans Thai'; }
+  .thread-list{ display:grid; gap:10px; overflow:auto; max-height:calc(92vh - 190px); padding-right:3px; }
+  .thread-item{ border:1px solid var(--line); border-radius:11px; background:#fff; padding:15px; cursor:pointer; }
+  .thread-item:hover{ border-color:var(--violet); background:var(--violet-soft); }
+  .thread-item strong{ display:block; font-size:16px; margin-bottom:5px; }
+  .thread-item small{ color:var(--muted); font-size:12px; }
+  .my-thread-empty{ text-align:center; color:var(--muted); padding:36px 12px; border:1px dashed var(--line); border-radius:11px; }
+  .modal-close{ position:absolute; top:13px; right:15px; width:30px; height:30px; border-radius:50%; background:#EDF1E9; color:var(--ink); font-size:20px; line-height:1; }
+  .modal h2{ font-size:25px; margin-bottom:5px; }
+  .modal-lead{ color:var(--muted); font-size:13.5px; margin-bottom:20px; }
+  .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+  .field{ display:flex; flex-direction:column; gap:5px; margin-bottom:13px; }
+  .field.full{ grid-column:1/-1; }
+  .field label{ font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .field input,.field textarea,.field select{ width:100%; border:1px solid var(--line); border-radius:9px; padding:10px 12px; background:#fff; color:var(--ink); outline:none; font:13.5px 'IBM Plex Sans Thai'; }
+  .field textarea{ min-height:105px; resize:vertical; }
+  .field input:focus,.field textarea:focus,.field select:focus{ border-color:var(--violet); box-shadow:0 0 0 3px var(--violet-soft); }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:9px; margin-top:8px; }
+  .btn-secondary{ background:#fff; color:var(--ink-soft); border:1px solid var(--line); padding:10px 17px; border-radius:9px; font-size:13.5px; }
+  .btn-small{ background:var(--violet); color:#fff; padding:10px 17px; border-radius:9px; font-weight:600; font-size:13.5px; }
+  .auth-tabs{ display:flex; gap:4px; background:#EAF0E9; border-radius:9px; padding:4px; margin:15px 0 18px; }
+  .auth-tab{ flex:1; padding:8px; border-radius:7px; color:var(--muted); background:transparent; font-size:13px; }
+  .auth-tab.active{ background:#fff; color:var(--ink); font-weight:600; box-shadow:0 2px 7px rgba(8,41,28,.08); }
+  .product-list{ display:grid; gap:11px; }
+  .product-row{ display:flex; align-items:center; gap:12px; padding:11px; border:1px solid var(--line); background:#fff; border-radius:11px; }
+  .product-row .thumb{ width:64px; height:52px; border-radius:7px; background-size:cover; background-position:center; flex-shrink:0; }
+  .product-row .product-info{ flex:1; }
+  .product-row strong{ display:block; font-size:14px; }
+  .product-row small{ color:var(--muted); font-size:11.5px; }
+  .product-row .product-price{ font-family:'Kanit'; font-weight:600; margin-right:5px; }
+  .cart-total{ display:flex; justify-content:space-between; border-top:1px solid var(--line); margin-top:17px; padding-top:14px; font-weight:600; }
+  .empty-cart{ text-align:center; color:var(--muted); padding:25px 0; font-size:14px; }
+  .dashboard-head{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:17px; }
+  .dashboard-kpis{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:17px; }
+  .kpi{ background:var(--violet-soft); padding:13px; border-radius:10px; }
+  .kpi b{ display:block; font:22px 'Kanit'; }
+  .kpi span{ color:var(--muted); font-size:11.5px; }
+  .activity{ border:1px solid var(--line); border-radius:10px; background:#fff; padding:13px; font-size:13px; }
+  .activity + .activity{ margin-top:8px; }
+  .account-status-card{ display:block; width:100%; text-align:left; color:var(--ink); cursor:pointer; }
+  .account-status-card:hover{ border-color:var(--violet); background:var(--violet-soft); }
+  .status-link{ float:right; color:var(--violet); font-size:12px; font-weight:600; }
+  .status-list{ display:grid; gap:9px; margin-top:16px; }
+  .status-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid var(--line); border-radius:9px; background:#fff; padding:12px; font-size:13px; }
+  .status-ok{ color:var(--sage); font-weight:600; font-size:12px; }
+  .info-copy{ color:var(--muted); font-size:13.5px; line-height:1.75; }
+  .info-copy ul{ margin:10px 0 0 20px; }
+  .plan-badge{ display:inline-flex; align-items:center; padding:4px 10px; border-radius:20px; background:var(--violet-soft); color:var(--violet); font-size:12px; font-weight:600; }
+  .plan-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+  .plan-card{ border:1px solid var(--line); border-radius:12px; background:#fff; padding:16px; }
+  .plan-card.premium{ border:2px solid var(--gold); background:#FFFDF5; }
+  .plan-card h3{ font-size:19px; margin-bottom:3px; }
+  .plan-price{ font:700 23px 'Kanit'; color:var(--ink); margin:8px 0 12px; }
+  .plan-price small{ font:400 12px 'IBM Plex Sans Thai'; color:var(--muted); }
+  .plan-features{ display:grid; gap:7px; color:var(--muted); font-size:12px; line-height:1.5; }
+  .quota-line{ display:flex; justify-content:space-between; gap:12px; margin-top:10px; color:var(--muted); font-size:12px; }
+  .quota-bar{ height:7px; border-radius:10px; background:#E7ECE4; overflow:hidden; margin-top:5px; }
+  .quota-bar span{ display:block; height:100%; width:0; background:var(--gold); border-radius:inherit; }
+  .field input:disabled{ background:#EEF1EC; color:#8B968C; cursor:not-allowed; }
+  .subscription-card{ cursor:pointer; }
+  .subscription-card:hover{ border-color:var(--gold); background:#FFFDF5; }
+  @media (max-width:600px){ .plan-grid{ grid-template-columns:1fr; } }
+  .toast{ position:fixed; z-index:150; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 17px; border-radius:9px; font-size:13px; opacity:0; pointer-events:none; transition:.25s; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .image-fallback{ background-image:linear-gradient(135deg,#DCEBDD,#8CB99C 52%,#245C42) !important; }
+  .payment-methods{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:15px 0 18px; }
+  .payment-method{ border:1px solid var(--line); background:#fff; border-radius:10px; padding:12px 7px; color:var(--ink-soft); font-size:12px; text-align:center; }
+  .payment-method.active{ border-color:var(--violet); background:var(--violet-soft); color:var(--ink); font-weight:600; }
+  .payment-method strong{ display:block; font-size:21px; line-height:1.25; margin-bottom:3px; }
+  .payment-panel{ display:none; padding:14px; border-radius:10px; background:#F0F4EE; }
+  .payment-panel.active{ display:block; }
+  .qr-code{ width:130px; height:130px; margin:2px auto 10px; padding:8px; background-color:#fff; background-image:linear-gradient(45deg,#08291C 25%,transparent 25%,transparent 75%,#08291C 75%),linear-gradient(45deg,#08291C 25%,transparent 25%,transparent 75%,#08291C 75%); background-position:0 0,13px 13px; background-size:26px 26px; border:8px solid #fff; }
+  .payment-note{ color:var(--muted); font-size:12px; text-align:center; }
+  .filter{ cursor:pointer; }
+  .qa-card.is-hidden{ display:none; }
+  .profile-avatar{ width:70px; height:70px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,#C99A3E,#0E6B3B); display:flex; align-items:center; justify-content:center; color:#fff; font:26px 'Kanit'; border:4px solid #fff; box-shadow:0 3px 12px rgba(8,41,28,.16); }
+  .profile-form-head{ display:flex; align-items:center; gap:14px; background:var(--violet-soft); padding:14px; border-radius:11px; margin:14px 0 18px; }
+  .profile-form-head strong{ display:block; font-size:15px; }
+  .profile-form-head span{ color:var(--muted); font-size:12px; }
+  .profile-options{ display:flex; gap:8px; flex-wrap:wrap; margin-top:5px; }
+  .profile-option{ width:38px; height:38px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1px var(--line); cursor:pointer; }
+  .profile-option.active{ box-shadow:0 0 0 2px var(--violet); }
+  .art-market{ max-width:1160px; margin:0 auto; padding:0 32px 72px; }
+  .art-market-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:15px; margin-bottom:18px; }
+  .art-market-head h3{ font:600 24px 'Kanit'; }
+  .art-market-head p{ font-size:13px; color:var(--muted); }
+  .art-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .art-card{ border:1px solid var(--line); background:#fff; border-radius:14px; padding:12px; }
+  .art-preview{ height:150px; border-radius:10px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
+  .art-preview::before{ content:''; width:88px; height:88px; border-radius:32% 68% 55% 45%; background:rgba(255,255,255,.72); transform:rotate(-18deg); box-shadow:25px -16px 0 rgba(255,255,255,.28),-22px 22px 0 rgba(8,41,28,.12); }
+  .art-one{ background:linear-gradient(135deg,#0E6B3B,#C99A3E); }
+  .art-two{ background:linear-gradient(135deg,#1C4161,#8AC7BE); }
+  .art-three{ background:linear-gradient(135deg,#A44736,#E8B85C); }
+  .art-card strong{ display:block; margin-top:10px; font-size:17px; line-height:1.35; }
+  .art-card small{ display:block; color:var(--muted); font-size:11.5px; min-height:34px; }
+  .art-card-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:9px; }
+  .art-card-foot b{ font:600 15px 'Kanit'; }
+  .art-use{ color:var(--violet); background:var(--violet-soft); padding:7px 9px; border-radius:7px; font-size:11px; }
+  .frame-preview{ height:150px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#F0F4EE; }
+  .frame-preview .profile-avatar{ width:88px; height:88px; }
+  .frame-one{ border:5px solid #C99A3E; box-shadow:0 0 0 4px #F8E7B8, inset 0 0 0 2px #fff; }
+  .frame-two{ border:5px solid #4C8F6C; box-shadow:0 0 0 4px #CBE4D2, inset 0 0 0 2px #fff; }
+  .frame-three{ border:5px solid #A44736; box-shadow:0 0 0 4px #F0C8A8, inset 0 0 0 2px #fff; }
+  .frame-option{ background:#F0F4EE; }
+  .frame-market{ padding-top:0; }
+  .seller-listing{ margin-top:16px; border:1px dashed var(--line); background:#F7F9F4; border-radius:12px; padding:13px; }
+  .seller-listing strong{ display:block; font-size:14px; }
+  .seller-listing small{ color:var(--muted); font-size:12px; }
+  .upload-preview{ min-height:58px; padding:12px; border:1px dashed var(--line); border-radius:9px; background:#fff; color:var(--muted); font-size:12px; }
+  .listing-type-note{ padding:9px 11px; border-radius:8px; background:var(--violet-soft); color:var(--ink-soft); font-size:12px; margin-bottom:14px; }
+  @media (max-width:600px){ .art-grid{ grid-template-columns:1fr; } .art-market-head{ display:block; } .art-market-head p{ margin-top:4px; } }
+  @media (max-width:600px){ .form-grid{ grid-template-columns:1fr; } .field.full{ grid-column:auto; } .modal{ padding:22px 18px; } .dashboard-kpis{ grid-template-columns:1fr 1fr; } .nav-right{ gap:6px; } .cart-button{ width:34px; height:34px; } }
+
+  footer{ background:var(--ink); padding:44px 32px 28px; }
+  .footer-inner{ max-width:1160px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  footer .wordmark{ color:#fff; }
+  .footer-links{ display:flex; gap:26px; font-size:13.5px; color:#A9B8AC; }
+  .footer-note{ font-size:12.5px; color:#6E7C71; margin-top:20px; text-align:center; }
+
+  @media (max-width:900px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .stats{ grid-template-columns:repeat(2,1fr); }
+    .qa-masonry{ columns:1; }
+    .nav-links{ display:none; }
+    .explore-panel-links{ display:flex; }
+    h1.headline{ font-size:32px; }
+    .hero-photo{ display:none; }
+    .photo-row{ height:180px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wordmark">
+    <svg viewBox="0 0 30 30" fill="none">
+      <circle cx="6" cy="7" r="4" fill="#08291C"/>
+      <circle cx="24" cy="23" r="4" fill="#0E6B3B"/>
+      <path d="M9 9 C14 9, 12 21, 21 21" stroke="#C99A3E" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>
+    ปูทาง
+  </div>
+  <div class="nav-links">
+    <a href="#" data-action="browse">ถาม-ตอบ</a>
+    <a href="#market" data-action="market">ชีทมาร์เก็ต</a>
+    <a href="#">ติดต่อเรา</a>
+  </div>
+  <div class="nav-right">
+    <div class="explore-toggle" onclick="document.getElementById('explorePanel').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </div>
+    <button class="nav-cta" data-action="auth">เข้าสู่ระบบ</button>
+    <button class="nav-subscribe" data-action="subscribe-menu">สมัคร Premium</button>
+    <div class="nav-account-tools" id="dashboardStrip">
+      <button class="account-tools-toggle" data-action="account-tools" aria-label="เปิดเมนูบัญชี" disabled>＋</button>
+      <div class="account-tools-panel" id="accountToolsPanel">
+        <button class="dash-btn" data-action="dashboard" data-role="seller">📊 dashboard ผู้ขาย</button>
+        <button class="dash-btn" data-action="dashboard" data-role="poster">📝 dashboard ผู้ตั้งกระทู้</button>
+        <button class="dash-btn" data-action="my-threads">📌 กระทู้ของฉัน</button>
+        <button class="dash-btn" data-action="profile">👤 แก้ไขโปรไฟล์</button>
+        <button class="dash-btn" data-action="subscription">✦ แพ็กเกจสมาชิก</button>
+        <button class="dash-btn" data-action="seller-upload">＋ ลงขาย / เปิดรับจอง</button>
+      </div>
+    </div>
+    <button class="cart-button" data-action="cart" aria-label="เปิดตะกร้า">🛒<span class="cart-count" id="cartCount">0</span></button>
+    <div class="explore-panel" id="explorePanel">
+      <div class="explore-panel-links">
+        <a href="#" data-action="browse">ถาม-ตอบ</a>
+        <a href="#market" data-action="market">ชีทมาร์เก็ต</a>
+        <a href="#">ติดต่อเรา</a>
+      </div>
+      <div class="explore-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="ค้นหาข่าวหรือกระทู้วันนี้...">
+      </div>
+      <div class="explore-label">วันนี้น่ารู้</div>
+      <div class="explore-item">
+        <div class="dot"></div>
+        <div class="txt"><span class="tag">ประกาศจากมหาลัย</span>เลื่อนกำหนดลงทะเบียนวิชาเลือกเสรี เป็นวันที่ 20 นี้</div>
+      </div>
+      <div class="explore-item">
+        <div class="dot"></div>
+        <div class="txt"><span class="tag">กระทู้มาแรง</span>รวมพิกัดที่จอดรถใกล้ตึกเรียนที่คนไม่ค่อยรู้</div>
+      </div>
+      <div class="explore-item">
+        <div class="dot"></div>
+        <div class="txt"><span class="tag">น่าลอง</span>เช็กลิสต์เตรียมตัวก่อนสอบกลางภาคจากรุ่นพี่ปี 4</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="campus-bar">
+  <div class="campus-bar-inner">
+    <span>📍 กำลังแสดงคอนเทนต์จาก <strong>มหาวิทยาลัยเกษตรศาสตร์ วิทยาเขตศรีราชา</strong></span>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <span class="live-pill"><span class="live-dot"></span> 214 รุ่นพี่ออนไลน์ตอนนี้</span>
+      <h1 class="headline" style="margin-top:18px;">ที่ที่รุ่นน้องปี 1 <span class="accent">ถามได้ทุกเรื่อง</span> แล้วมีคนตอบจริง</h1>
+      <p class="sub">ชุมชนถาม-ตอบที่รุ่นพี่ในคณะเดียวกันคอยตอบคำถามให้ ตั้งแต่เรื่องเรียน ทางเดินในมหาลัย ไปจนถึงชีวิตนักศึกษาที่ไม่มีใครสอนในปฐมนิเทศ</p>
+      <div class="hero-ctas">
+        <button class="btn-primary" data-action="post">ถามคำถามแรกของคุณ</button>
+        <a href="#community" class="btn-ghost">ดูคำถามล่าสุด</a>
+      </div>
+    </div>
+    <div class="hero-photo"></div>
+    <div class="feed-mock">
+      <div class="feed-head">
+        <strong>คำถามล่าสุด</strong>
+        <span style="font-size:12px; color:var(--muted);">อัปเดตทุกนาที</span>
+      </div>
+      <div class="feed-item answered">
+        <div class="avatar" style="background:#0E6B3B;">น</div>
+        <div>
+          <div class="q">ลงทะเบียนวิชาเลือกเสรีตอนไหนไม่โดนเต็มก่อน?</div>
+          <div class="meta"><span class="tag-chip">วิศวกรรมศาสตร์</span><span class="status-answered">✓ ตอบแล้ว</span></div>
+        </div>
+      </div>
+      <div class="feed-item open">
+        <div class="avatar" style="background:#C99A3E;">ก</div>
+        <div>
+          <div class="q">ตึก SC3 กับ SC5 อยู่ไกลกันไหม เดินทันคาบถัดไปมั้ย?</div>
+          <div class="meta"><span class="tag-chip">วิทยาศาสตร์</span><span class="status-open">รอคำตอบ</span></div>
+        </div>
+      </div>
+      <div class="feed-item answered">
+        <div class="avatar" style="background:#4C8F6C;">พ</div>
+        <div>
+          <div class="q">วิชา Intro to Logistics ต้องซื้อหนังสือเพิ่มไหมหรือใช้สไลด์อาจารย์พอ?</div>
+          <div class="meta"><span class="tag-chip">พาณิชยนาวีนานาชาติ</span><span class="status-answered">✓ ตอบแล้ว</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ad-slot">
+  <div class="ad-label">ผู้สนับสนุนอย่างเป็นทางการ</div>
+  <div class="ad-carousel" id="adCarousel">
+    <div class="ad-slide pos-0">พื้นที่โฆษณา 1 · 1160×112</div>
+    <div class="ad-slide pos-1">พื้นที่โฆษณา 2 · 1160×112</div>
+    <div class="ad-slide pos-2">พื้นที่โฆษณา 3 · 1160×112</div>
+  </div>
+  <div class="ad-dots" id="adDots">
+    <span class="ad-dot active"></span>
+    <span class="ad-dot"></span>
+    <span class="ad-dot"></span>
+  </div>
+</div>
+
+<div class="photo-band">
+  <div class="photo-row">
+    <div class="ph" style="background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=60');"></div>
+    <div class="ph" style="background-image:url('https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=500&q=60');">
+      <div class="cap">คำถามที่รุ่นพี่ตอบให้ทุกวัน ไม่ใช่แค่วันปฐมนิเทศ</div>
+    </div>
+    <div class="ph" style="background-image:url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=500&q=60');"></div>
+  </div>
+</div>
+
+<section class="community" id="community">
+  <div class="community-head">
+    <h2>คำถามที่กำลังคุยกันอยู่</h2>
+    <div><p>คัดจากทุกคณะ อัปเดตแบบเรียลไทม์ ถามได้ทุกเรื่องไม่ว่าจะเล็กหรือใหญ่</p><button class="btn-secondary" data-action="browse">ดูทั้งหมด →</button></div>
+  </div>
+  <div class="filters">
+    <span class="filter active" data-filter="ทั้งหมด">ทั้งหมด</span>
+    <span class="filter" data-filter="เรื่องเรียน">เรื่องเรียน</span>
+    <span class="filter" data-filter="ทางเดิน/สถานที่">ทางเดิน/สถานที่</span>
+    <span class="filter" data-filter="ชีวิตนักศึกษา">ชีวิตนักศึกษา</span>
+    <span class="filter" data-filter="ลงทะเบียนเรียน">ลงทะเบียนเรียน</span>
+    <span class="filter" data-filter="ทุน/หอพัก">ทุน/หอพัก</span>
+  </div>
+  <div class="qa-masonry">
+    <div class="qa-card" data-category="เรื่องเรียน">
+      <div class="top"><span class="faculty">วิศวกรรมศาสตร์ศรีราชา</span></div>
+      <div class="question">วิชา Data Structure อาจารย์คนไหนสอนเข้าใจง่ายกว่ากันระหว่าง Sec 1 กับ Sec 2?</div>
+      <div class="answer-row">
+        <div class="avatar" style="background:#0E6B3B;">ก</div>
+        <div>
+          <div class="answer-name">พี่กันต์ ปี 4</div>
+          <div class="answer-body">Sec 2 สอนช้ากว่านิดหน่อยแต่ยกตัวอย่างเยอะ ถ้าพื้นฐานไม่แน่นแนะนำ Sec 2 เลย</div>
+        </div>
+      </div>
+      <div class="card-foot"><span>👍 34</span><span>💬 6 คำตอบ</span></div>
+    </div>
+    <div class="qa-card" data-category="ทุน/หอพัก">
+      <div class="top"><span class="faculty">ทั่วไป</span></div>
+      <div class="question">หอในกับหอนอกมหาลัยศรีราชา ต่างกันมากไหมสำหรับปี 1 ที่ยังไม่มีรถ?</div>
+      <div class="answer-row">
+        <div class="avatar" style="background:#C99A3E;">ฟ</div>
+        <div>
+          <div class="answer-name">พี่เฟิร์น ปี 3</div>
+          <div class="answer-body">ปีแรกแนะนำหอในก่อน สะดวกเรื่องเดินไปคาบเช้าเร่งด่วน ปีสองค่อยย้ายออกก็ได้</div>
+        </div>
+      </div>
+      <div class="card-foot"><span>👍 51</span><span>💬 12 คำตอบ</span></div>
+    </div>
+    <div class="qa-card" data-category="เรื่องเรียน">
+      <div class="top"><span class="faculty">วิทยาการจัดการ</span></div>
+      <div class="question">โปรเจกต์กลุ่มวิชา Principle of Marketing เริ่มเก็บข้อมูลตอนไหนไม่ให้กระชั้น?</div>
+      <div class="answer-row">
+        <div class="avatar" style="background:#4C8F6C;">ต</div>
+        <div>
+          <div class="answer-name">พี่ต้นกล้า ปี 3</div>
+          <div class="answer-body">เริ่มสัปดาห์ที่ 4 เก็บแบบสอบถามได้เลย อาจารย์มักประกาศหัวข้อช้าแต่เดดไลน์ไม่เลื่อน</div>
+        </div>
+      </div>
+      <div class="card-foot"><span>👍 22</span><span>💬 4 คำตอบ</span></div>
+    </div>
+    <div class="qa-card" data-category="ทางเดิน/สถานที่">
+      <div class="top"><span class="faculty">วิทยาศาสตร์ ศรีราชา</span></div>
+      <div class="question">มีที่นั่งอ่านหนังสือเงียบๆ แถวตึก SC ไหม ห้องสมุดคนเยอะช่วงสอบ?</div>
+      <div class="answer-row">
+        <div class="avatar" style="background:#0E6B3B;">น</div>
+        <div>
+          <div class="answer-name">พี่นนท์ ปี 3</div>
+          <div class="answer-body">ชั้น 4 ของตึก SC2 คนน้อยมาก แอร์เย็นด้วย เปิดถึง 3 ทุ่ม</div>
+        </div>
+      </div>
+      <div class="card-foot"><span>👍 18</span><span>💬 3 คำตอบ</span></div>
+    </div>
+  </div>
+  <div class="ask-cta">
+    <h3>มีคำถามที่ยังไม่มีใครตอบ?</h3>
+    <p>ตั้งคำถามได้เลย รุ่นพี่ในคณะของคุณจะเห็นและตอบภายในไม่กี่นาที</p>
+    <button class="btn-primary" data-action="post">ตั้งคำถามใหม่</button>
+  </div>
+</section>
+
+<section class="market" id="market">
+  <div class="market-head">
+    <h3>อยากได้ชีทสรุปหรือติวเตอร์เพิ่ม?</h3>
+    <a href="#" data-action="market-all">ดูสินค้าทั้งหมด →</a>
+  </div>
+  <p class="market-sub">เลือกซื้อจากรุ่นพี่ที่รีวิวดีที่สุดในแต่ละวิชา</p>
+  <div class="carousel-wrap">
+    <div class="carousel" id="carousel">
+      <div class="mini-card">
+        <div class="mini-thumb" style="background-image:url('https://images.unsplash.com/photo-1554475900-0a0350e3fc7b?auto=format&fit=crop&w=300&q=60');"><span>CHEM 201</span></div>
+        <div class="name">ชีทสรุปเคมีอินทรีย์</div>
+        <div class="who">พี่เฟิร์น ปี 4 · ศรีราชา</div>
+        <div class="foot"><span class="price">฿120</span><span class="rate">★4.9</span></div><button class="btn-small" data-add="ชีทสรุปเคมีอินทรีย์|120">เพิ่มลงตะกร้า</button>
+      </div>
+      <div class="mini-card">
+        <div class="mini-thumb" style="background-image:url('https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=300&q=60');"><span>ติวเตอร์</span></div>
+        <div class="name">ติวพูด-เขียน ENG105</div>
+        <div class="who">พี่ต้นกล้า ปี 3 · ศรีราชา</div>
+        <div class="foot"><span class="price">฿250/ชม.</span><span class="rate">★5.0</span></div><button class="btn-small" data-add="ติวพูด-เขียน ENG105|250">จองติว</button>
+      </div>
+      <div class="mini-card">
+        <div class="mini-thumb" style="background-image:url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=300&q=60');"><span>CS 210</span></div>
+        <div class="name">ชีทสรุป+โจทย์ฝึก</div>
+        <div class="who">พี่กันต์ ปี 4 · ศรีราชา</div>
+        <div class="foot"><span class="price">฿150</span><span class="rate">★4.8</span></div><button class="btn-small" data-add="ชีทสรุป+โจทย์ฝึก|150">เพิ่มลงตะกร้า</button>
+      </div>
+      <div class="mini-card">
+        <div class="mini-thumb" style="background-image:url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=300&q=60');"><span>MKT 110</span></div>
+        <div class="name">สรุป Principle of Marketing</div>
+        <div class="who">พี่มายด์ ปี 4 · ศรีราชา</div>
+        <div class="foot"><span class="price">฿100</span><span class="rate">★4.7</span></div><button class="btn-small" data-add="สรุป Principle of Marketing|100">เพิ่มลงตะกร้า</button>
+      </div>
+      <div class="mini-card">
+        <div class="mini-thumb" style="background-image:url('https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=300&q=60');"><span>ติวเตอร์</span></div>
+        <div class="name">ติวแคลคูลัส 1 ก่อนสอบ</div>
+        <div class="who">พี่ปาล์ม ปี 3 · ศรีราชา</div>
+        <div class="foot"><span class="price">฿200/ชม.</span><span class="rate">★4.9</span></div><button class="btn-small" data-add="ติวแคลคูลัส 1 ก่อนสอบ|200">จองติว</button>
+      </div>
+      <div class="mini-card">
+        <div class="mini-thumb" style="background-image:url('https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=300&q=60');"><span>PHY 101</span></div>
+        <div class="name">สรุปฟิสิกส์ 1 ฉบับเข้าใจง่าย</div>
+        <div class="who">พี่บูม ปี 4 · ศรีราชา</div>
+        <div class="foot"><span class="price">฿110</span><span class="rate">★4.6</span></div><button class="btn-small" data-add="สรุปฟิสิกส์ 1 ฉบับเข้าใจง่าย|110">เพิ่มลงตะกร้า</button>
+      </div>
+    </div>
+    <div class="carousel-arrows">
+      <div class="arrow-btn" onclick="document.getElementById('carousel').scrollBy({left:-360,behavior:'smooth'})">←</div>
+      <div class="arrow-btn" onclick="document.getElementById('carousel').scrollBy({left:360,behavior:'smooth'})">→</div>
+    </div>
+  </div>
+</section>
+
+<section class="art-market">
+  <div class="art-market-head"><div><h3>Profile Picture Arts</h3><p>งานอาร์ตสำหรับแต่งโปรไฟล์จากศิลปินในชุมชน</p></div><span class="live-pill">3 ชิ้นแนะนำ</span></div>
+  <div class="art-grid">
+    <div class="art-card"><div class="art-preview art-one"><div class="profile-avatar">ป</div></div><strong>Forest Link</strong><small>โทนป่าเขียว-ทอง สำหรับสายกิจกรรมและชุมชน</small><div class="art-card-foot"><b>฿79</b><div><button class="art-use" data-avatar="art-one">ทดลองใช้</button> <button class="btn-small" data-add="Forest Link · profile art|79|art-one">ซื้อ</button></div></div></div>
+    <div class="art-card"><div class="art-preview art-two"><div class="profile-avatar">ป</div></div><strong>Ocean Study</strong><small>โทนน้ำเงินสงบ สำหรับสายอ่านหนังสือและติว</small><div class="art-card-foot"><b>฿99</b><div><button class="art-use" data-avatar="art-two">ทดลองใช้</button> <button class="btn-small" data-add="Ocean Study · profile art|99|art-two">ซื้อ</button></div></div></div>
+    <div class="art-card"><div class="art-preview art-three"><div class="profile-avatar">ป</div></div><strong>Sunset Club</strong><small>โทนอบอุ่นสำหรับคนชอบคุยและสร้างคอมมูนิตี้</small><div class="art-card-foot"><b>฿89</b><div><button class="art-use" data-avatar="art-three">ทดลองใช้</button> <button class="btn-small" data-add="Sunset Club · profile art|89|art-three">ซื้อ</button></div></div></div>
+  </div>
+</section>
+
+<section class="art-market frame-market">
+  <div class="art-market-head"><div><h3>Profile Frames</h3><p>กรอบโปรไฟล์ลิมิเต็ดสำหรับแสดงตัวตนในชุมชน</p></div><span class="live-pill">3 แบบใหม่</span></div>
+  <div class="art-grid">
+    <div class="art-card"><div class="frame-preview"><div class="profile-avatar frame-one">ป</div></div><strong>Campus Gold</strong><small>กรอบทองคลาสสิกสำหรับสายรุ่นพี่และผู้นำกิจกรรม</small><div class="art-card-foot"><b>฿49</b><button class="btn-small" data-add="Campus Gold · profile frame|49|frame-one">ซื้อกรอบ</button></div></div>
+    <div class="art-card"><div class="frame-preview"><div class="profile-avatar frame-two">ป</div></div><strong>Eco Leaf</strong><small>กรอบเขียวธรรมชาติสำหรับสายรักษ์โลกและชมรม</small><div class="art-card-foot"><b>฿59</b><button class="btn-small" data-add="Eco Leaf · profile frame|59|frame-two">ซื้อกรอบ</button></div></div>
+    <div class="art-card"><div class="frame-preview"><div class="profile-avatar frame-three">ป</div></div><strong>Sunset Badge</strong><small>กรอบโทนอุ่นสำหรับสมาชิกที่ชอบสร้างสีสัน</small><div class="art-card-foot"><b>฿69</b><button class="btn-small" data-add="Sunset Badge · profile frame|69|frame-three">ซื้อกรอบ</button></div></div>
+  </div>
+</section>
+
+<div class="art-market" id="sellerListings" style="padding-top:0;display:none;"><div class="art-market-head"><div><h3>รายการของฉัน</h3><p>สินค้าที่คุณเพิ่งสร้างจะแสดงตรงนี้</p></div></div><div class="art-grid" id="sellerListingGrid"></div></div>
+
+<div class="stats">
+  <div class="stat"><h3>2,600+</h3><p>คำถามที่ถูกตอบแล้ว</p></div>
+  <div class="stat"><h3>640+</h3><p>รุ่นพี่ที่ยืนยันตัวตนแล้ว</p></div>
+  <div class="stat"><h3>18 นาที</h3><p>เวลาเฉลี่ยที่ได้คำตอบ</p></div>
+  <div class="stat"><h3>6</h3><p>คณะ/สาขาที่มีรุ่นพี่ประจำ</p></div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="wordmark">ปูทาง</div>
+    <div class="footer-links">
+      <a href="#" data-action="info" data-info="about">เกี่ยวกับเรา</a>
+      <a href="#" data-action="info" data-info="rules">กติกาชุมชน</a>
+      <a href="#" data-action="info" data-info="seller">สำหรับรุ่นพี่แนะแนว</a>
+      <a href="#" data-action="info" data-info="contact">ติดต่อเรา</a>
+      <a href="#" data-action="info" data-info="terms">ข้อกำหนดการใช้งาน</a>
+    </div>
+  </div>
+  <div class="footer-note">ปูทาง — ชุมชนถาม-ตอบของรุ่นพี่รุ่นน้อง</div>
+</footer>
+
+<div class="modal-backdrop" id="authModal">
+  <div class="modal"><button class="modal-close" data-close="authModal">×</button><h2>ยินดีต้อนรับกลับมา</h2><p class="modal-lead">เข้าสู่ชุมชนปูทาง แล้วเริ่มถามหรือแบ่งปันประสบการณ์ได้เลย</p>
+    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">เข้าสู่ระบบ</button><button class="auth-tab" data-tab="register">สมัครสมาชิก</button></div>
+    <form id="authForm"><div class="field"><label>อีเมลมหาวิทยาลัย</label><input type="email" required placeholder="name@ku.th"></div><div class="field"><label>รหัสผ่าน</label><input type="password" required placeholder="อย่างน้อย 8 ตัวอักษร"></div><div class="field register-only" style="display:none"><label>ชื่อที่แสดง</label><input type="text" placeholder="เช่น พี่กันต์ ปี 4"></div><div class="modal-actions"><button type="submit" class="btn-small">เข้าสู่ระบบ</button></div></form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="profileModal"><div class="modal"><button class="modal-close" data-close="profileModal">×</button><h2>แก้ไขโปรไฟล์</h2><p class="modal-lead">ปรับข้อมูลที่คนในชุมชนจะเห็นบนโปรไฟล์ของคุณ</p><form id="profileForm"><div class="profile-form-head"><div class="profile-avatar" id="profileAvatar">ป</div><div><strong id="profileNamePreview">น้องปูทาง</strong><span>สมาชิกมหาวิทยาลัยเกษตรศาสตร์ ศรีราชา</span></div></div><div class="field"><label>รูปโปรไฟล์ที่เป็นเจ้าของ</label><div class="profile-options"><button type="button" class="profile-option art-one active" data-profile-avatar="art-one"></button><button type="button" class="profile-option art-two" data-profile-avatar="art-two"></button><button type="button" class="profile-option art-three" data-profile-avatar="art-three"></button></div></div><div class="field"><label>กรอบโปรไฟล์ที่เป็นเจ้าของ</label><div class="profile-options"><button type="button" class="profile-option frame-option" data-profile-frame="frame-none">ไม่มีกรอบ</button><button type="button" class="profile-option frame-one" data-profile-frame="frame-one"></button><button type="button" class="profile-option frame-two" data-profile-frame="frame-two"></button><button type="button" class="profile-option frame-three" data-profile-frame="frame-three"></button></div></div><div class="form-grid"><div class="field"><label>ชื่อที่แสดง</label><input id="profileName" required value="น้องปูทาง"></div><div class="field"><label>อีเมล</label><input id="profileEmail" type="email" required value="student@ku.th"></div><div class="field"><label>รหัสผ่านใหม่</label><input id="profilePassword" type="password" minlength="8" placeholder="เว้นว่างถ้าไม่เปลี่ยน"></div><div class="field"><label>คณะ / ชั้นปี</label><input id="profileFaculty" value="วิศวกรรมศาสตร์ · ปี 1"></div><div class="field full"><label>แนะนำตัวสั้น ๆ</label><textarea id="profileBio" placeholder="เช่น สนใจเรื่องการเรียนและกิจกรรมในมหาลัย"></textarea></div></div><div class="modal-actions"><button type="button" class="btn-secondary" data-close="profileModal">ยกเลิก</button><button type="submit" class="btn-small">บันทึกโปรไฟล์</button></div></form></div></div>
+
+<div class="modal-backdrop" id="sellerUploadModal"><div class="modal wide"><button class="modal-close" data-close="sellerUploadModal">×</button><h2>ลงขาย / เปิดรับจอง</h2><p class="modal-lead">แพ็กเกจปัจจุบัน: <span class="plan-badge" id="uploadPlanBadge">Free</span></p><form id="sellerUploadForm"><div class="field"><label>ประเภทรายการ</label><select id="listingType"><option value="ชีท">ชีท / ไฟล์ติว</option><option value="รูปโปรไฟล์">รูปโปรไฟล์อาร์ต</option><option value="กรอบโปรไฟล์">กรอบโปรไฟล์</option><option value="ติวเตอร์">รับจองติวเตอร์</option></select></div><div class="listing-type-note" id="listingTypeNote">Free: เหลือโควตา 5 รายการในเดือนนี้ · PDF ไม่เกิน 5MB · วิดีโอไม่เกิน 50MB · ห้ามใส่ลิงก์</div><div class="form-grid"><div class="field"><label>ชื่อรายการ</label><input id="listingTitle" required placeholder="เช่น สรุป Calculus 1 ฉบับก่อนสอบ"></div><div class="field"><label>ราคา (บาท)</label><input id="listingPrice" type="number" min="1" required placeholder="150"></div><div class="field full"><label>รายละเอียด</label><textarea id="listingDescription" required placeholder="บอกจุดเด่น เนื้อหา หรือประสบการณ์ของคุณ"></textarea></div><div class="field"><label>ไฟล์หรือภาพตัวอย่าง</label><input id="listingFile" type="file" accept="*/*"></div><div class="field tutor-only" style="display:none"><label>วันและเวลาที่รับจอง</label><input id="listingSchedule" placeholder="เสาร์-อาทิตย์ 10:00-17:00"></div><div class="field full"><label>ลิงก์ประกอบ (Premium)</label><input id="listingLink" type="url" placeholder="https://..."></div><div class="field full"><div class="upload-preview" id="uploadPreview">ยังไม่ได้เลือกไฟล์ · ระบบเดโมจะแสดงรายการทันทีหลังเผยแพร่</div></div></div><div class="modal-actions"><button type="button" class="btn-secondary" data-close="sellerUploadModal">ยกเลิก</button><button type="submit" class="btn-small">เผยแพร่รายการ</button></div></form></div></div>
+
+<div class="modal-backdrop" id="postModal"><div class="modal"><button class="modal-close" data-close="postModal">×</button><h2>ตั้งกระทู้ใหม่</h2><p class="modal-lead">คำถามชัด ๆ ช่วยให้รุ่นพี่ตอบได้ไวขึ้น</p><form id="postForm"><div class="form-grid"><div class="field full"><label>หัวข้อกระทู้</label><input required placeholder="เช่น วิชาไหนเหมาะกับคนพื้นฐานไม่แน่น?"></div><div class="field"><label>หมวดหมู่</label><select><option>เรื่องเรียน</option><option>ชีวิตนักศึกษา</option><option>ทุน/หอพัก</option><option>ทางเดิน/สถานที่</option></select></div><div class="field"><label>คณะ/สาขา</label><input placeholder="วิศวกรรมศาสตร์"></div><div class="field full"><label>รายละเอียด</label><textarea required placeholder="เล่าโจทย์หรือบริบทเพิ่มเติม..."></textarea></div></div><div class="modal-actions"><button type="button" class="btn-secondary" data-close="postModal">ยกเลิก</button><button type="submit" class="btn-small">เผยแพร่กระทู้</button></div></form></div></div>
+
+<div class="modal-backdrop" id="readModal"><div class="modal wide"><button class="modal-close" data-close="readModal">×</button><span class="faculty">วิศวกรรมศาสตร์ศรีราชา · 12 นาทีที่แล้ว</span><h2 id="readTitle">วิชา Data Structure อาจารย์คนไหนสอนเข้าใจง่ายกว่ากัน?</h2><p class="modal-lead">ถามโดย น้องมินท์ ปี 1 · 👍 34 คนถูกใจ</p><div class="activity"><strong>พี่กันต์ ปี 4</strong><br>Sec 2 สอนช้ากว่านิดหน่อยแต่ยกตัวอย่างเยอะ ถ้าพื้นฐานไม่แน่นแนะนำ Sec 2 เลย</div><div class="activity"><strong>พี่นนท์ ปี 3</strong><br>เห็นด้วยกับ Sec 2 ครับ และลองเข้ากลุ่มไลน์ของวิชาก่อนลงทะเบียนด้วย</div><div class="field" style="margin-top:16px"><label>ร่วมตอบคำถาม</label><textarea placeholder="แบ่งปันประสบการณ์ของคุณ..."></textarea></div><div class="modal-actions"><button class="btn-small" data-action="toast" data-message="ส่งคำตอบแล้ว ขอบคุณที่ช่วยชุมชนครับ">ส่งคำตอบ</button></div></div></div>
+
+<div class="modal-backdrop" id="browseModal"><div class="modal wide"><button class="modal-close" data-close="browseModal">×</button><div class="dashboard-head"><div><span class="faculty">COMMUNITY</span><h2>กระทู้ทั้งหมด</h2></div><button class="btn-small" data-action="post">＋ ตั้งกระทู้</button></div><div class="activity"><strong>วิชา Data Structure อาจารย์คนไหนสอนเข้าใจง่ายกว่ากัน?</strong><br><span class="faculty">วิศวกรรมศาสตร์ · 6 คำตอบ</span><br>Sec 2 สอนช้ากว่านิดหน่อย แต่ยกตัวอย่างเยอะ ถ้าพื้นฐานไม่แน่นแนะนำ Sec 2</div><div class="activity"><strong>หอในกับหอนอกมหาลัยศรีราชา ต่างกันมากไหม?</strong><br><span class="faculty">ทุน/หอพัก · 12 คำตอบ</span><br>ปีแรกแนะนำหอในก่อน สะดวกเรื่องเดินไปคาบเช้าเร่งด่วน</div><div class="activity"><strong>มีที่นั่งอ่านหนังสือเงียบ ๆ แถวตึก SC ไหม?</strong><br><span class="faculty">ทางเดิน/สถานที่ · 3 คำตอบ</span><br>ชั้น 4 ของตึก SC2 คนน้อยและเปิดถึง 3 ทุ่ม</div></div></div>
+
+<div class="modal-backdrop" id="cartModal"><div class="modal"><button class="modal-close" data-close="cartModal">×</button><h2>ตะกร้าของฉัน</h2><p class="modal-lead">ตรวจสอบชีทและรอบติวก่อนชำระเงิน</p><div class="product-list" id="cartItems"><div class="empty-cart">ยังไม่มีสินค้าในตะกร้า</div></div><div class="cart-total"><span>ยอดรวม</span><span id="cartTotal">฿0</span></div><div class="modal-actions"><button class="btn-small" data-action="checkout">ไปชำระเงิน</button></div></div></div>
+<div class="modal-backdrop" id="allProductsModal"><div class="modal page-modal"><button class="modal-close" data-close="allProductsModal">×</button><div class="dashboard-head"><div><span class="faculty">MARKETPLACE</span><h2>สินค้าทั้งหมด</h2></div><button class="btn-secondary" data-action="cart">🛒 ตะกร้า</button></div><p class="modal-lead">ชีท รูปโปรไฟล์ กรอบ และรอบติวจากสมาชิกในชุมชน</p><div class="product-list"><div class="product-row"><div class="product-info"><strong>ชีทสรุปเคมีอินทรีย์</strong><small>พี่เฟิร์น ปี 4 · CHEM 201 · ★4.9</small></div><span class="product-price">฿120</span><button class="btn-small" data-add="ชีทสรุปเคมีอินทรีย์|120">ซื้อ</button></div><div class="product-row"><div class="product-info"><strong>ติวพูด-เขียน ENG105</strong><small>พี่ต้นกล้า ปี 3 · รอบติวรายชั่วโมง · ★5.0</small></div><span class="product-price">฿250</span><button class="btn-small" data-add="ติวพูด-เขียน ENG105|250">จอง</button></div><div class="product-row"><div class="product-info"><strong>Forest Link · profile art</strong><small>รูปโปรไฟล์อาร์ตจากชุมชน</small></div><span class="product-price">฿79</span><button class="btn-small" data-add="Forest Link · profile art|79|art-one">ซื้อ</button></div><div class="product-row"><div class="product-info"><strong>Campus Gold · profile frame</strong><small>กรอบโปรไฟล์ลิมิเต็ด</small></div><span class="product-price">฿49</span><button class="btn-small" data-add="Campus Gold · profile frame|49|frame-one">ซื้อ</button></div></div></div></div>
+
+<div class="modal-backdrop" id="paymentModal"><div class="modal"><button class="modal-close" data-close="paymentModal">×</button><h2>ชำระเงิน</h2><p class="modal-lead">ระบบจำลอง payment gateway · ไม่มียอดเงินจริง</p><div class="cart-total" style="margin-top:0;border-top:0;padding-top:0"><span>ยอดที่ต้องชำระ</span><span id="paymentTotal">฿0</span></div><div class="payment-methods"><button class="payment-method active" data-payment="truemoney"><strong>TM</strong>ทรูมันนี่</button><button class="payment-method" data-payment="promptpay"><strong>PP</strong>พร้อมเพย์</button><button class="payment-method" data-payment="card"><strong>▣</strong>บัตรเครดิต</button></div><div class="payment-panel active" data-payment-panel="truemoney"><div class="field"><label>เบอร์โทรศัพท์ที่ผูกกับทรูมันนี่</label><input id="truemoneyPhone" inputmode="tel" placeholder="08x-xxx-xxxx"></div><div class="payment-note">กดยืนยันเพื่อจำลองการส่งคำขอไปยังทรูมันนี่</div></div><div class="payment-panel" data-payment-panel="promptpay"><div class="qr-code" aria-label="QR code จำลอง"></div><div class="payment-note">สแกน QR จำลองด้วยแอปธนาคาร แล้วกดยืนยันรายการ</div></div><div class="payment-panel" data-payment-panel="card"><div class="field"><label>หมายเลขบัตร</label><input inputmode="numeric" placeholder="4242 4242 4242 4242"></div><div class="form-grid"><div class="field"><label>วันหมดอายุ</label><input placeholder="MM/YY"></div><div class="field"><label>CVV</label><input inputmode="numeric" placeholder="123"></div></div><div class="field"><label>ชื่อบนบัตร</label><input placeholder="ชื่อ-นามสกุลภาษาอังกฤษ"></div></div><div class="modal-actions"><button class="btn-secondary" data-close="paymentModal">ยกเลิก</button><button class="btn-small" data-action="pay">ยืนยันการชำระเงิน</button></div></div></div>
+
+<div class="modal-backdrop" id="dashboardModal"><div class="modal wide"><button class="modal-close" data-close="dashboardModal">×</button><div class="dashboard-head"><div><span class="faculty" id="dashboardRole">dashboard ผู้ขาย</span><h2>ภาพรวมบัญชี</h2></div><span class="live-pill">บัญชียืนยันแล้ว</span></div><div class="dashboard-kpis"><div class="kpi"><b id="kpiOne">฿4,820</b><span id="kpiOneLabel">รายได้เดือนนี้</span></div><div class="kpi"><b>18</b><span>รายการทั้งหมด</span></div><div class="kpi"><b>4.9 ★</b><span>คะแนนรีวิว</span></div></div><button class="activity subscription-card" data-action="subscription"><strong>แพ็กเกจสมาชิก <span class="status-link" id="dashboardPlan">Free · ดูแพ็กเกจ →</span></strong><div class="quota-line"><span>โควตาลงขายเดือนนี้</span><span id="dashboardQuota">0 / 5 รายการ</span></div><div class="quota-bar"><span id="dashboardQuotaBar"></span></div></button><div class="activity"><strong>รายการล่าสุด</strong><br><span id="dashboardActivity">มีผู้ซื้อชีท CHEM 201 เมื่อ 8 นาทีที่แล้ว · รอส่งไฟล์</span></div><button class="activity account-status-card" data-action="account-status"><strong>สถานะบัญชี <span class="status-link">ดูรายละเอียด →</span></strong><br>ข้อมูลโปรไฟล์และบัญชีรับเงินครบถ้วน พร้อมรับออเดอร์ใหม่</button></div></div>
+
+<div class="modal-backdrop" id="accountStatusModal"><div class="modal"><button class="modal-close" data-close="accountStatusModal">×</button><span class="faculty">ACCOUNT CENTER</span><h2>สถานะบัญชี</h2><p class="modal-lead">ตรวจสอบความพร้อมก่อนใช้งาน marketplace และชุมชน</p><div class="status-list"><div class="status-row"><span>อีเมลและบัญชีสมาชิก</span><span class="status-ok">✓ ยืนยันแล้ว</span></div><div class="status-row"><span>โปรไฟล์ผู้ใช้</span><span class="status-ok">✓ ข้อมูลครบถ้วน</span></div><div class="status-row"><span>บัญชีรับเงินสำหรับผู้ขาย</span><span class="status-ok">✓ พร้อมรับเงิน</span></div><div class="status-row"><span>สิทธิ์ลงขายและรับจองติว</span><span class="status-ok">✓ เปิดใช้งาน</span></div></div><div class="modal-actions"><button class="btn-small" data-action="profile">แก้ไขข้อมูลโปรไฟล์</button></div></div></div>
+<div class="modal-backdrop" id="subscriptionModal"><div class="modal wide"><button class="modal-close" data-close="subscriptionModal">×</button><span class="faculty">MEMBERSHIP</span><h2>เลือกแพ็กเกจของคุณ</h2><p class="modal-lead">อัปเกรดเพื่อขายและแชร์คอนเทนต์ได้เต็มที่</p><div class="plan-grid"><div class="plan-card"><h3>Free</h3><div class="plan-price">฿0 <small>/ เดือน</small></div><div class="plan-features"><span>✓ โพสต์ลงขาย 5 รายการ / เดือน</span><span>✓ PDF สูงสุด 5MB / ไฟล์</span><span>✓ วิดีโอสูงสุด 50MB</span><span>✓ การมองเห็นปกติ</span><span>× ห้ามแปะลิงก์ Premium</span></div><div class="modal-actions"><span class="plan-badge">แพ็กเกจปัจจุบัน</span></div></div><div class="plan-card premium"><h3>Premium</h3><div class="plan-price">฿129 <small>/ เดือน</small></div><div class="plan-features"><span>✓ โพสต์ลงขายไม่จำกัดโควตา</span><span>✓ ไฟล์ทุกชนิดไม่จำกัดขนาด</span><span>✓ คลิปวิดีโอไม่จำกัดขนาด</span><span>✓ ฝากลิงก์ Premium ได้</span><span>✓ การมองเห็นแบบ Premium</span></div><div class="modal-actions"><button class="btn-small" data-action="subscribe">สมัคร Premium ฿129/เดือน</button></div></div></div></div></div>
+<div class="modal-backdrop" id="allThreadsModal"><div class="modal page-modal"><button class="modal-close" data-close="allThreadsModal">×</button><div class="dashboard-head"><div><span class="faculty">COMMUNITY</span><h2>กระทู้ทั้งหมด</h2></div><button class="btn-primary" data-action="post">＋ ตั้งกระทู้</button></div><div class="thread-toolbar"><input class="thread-search" id="threadSearch" type="search" placeholder="ค้นหากระทู้หรือวิชา..."><div class="filters" style="margin:0"><button class="filter active" data-thread-filter="ทั้งหมด">ทั้งหมด</button><button class="filter" data-thread-filter="เรื่องเรียน">เรื่องเรียน</button><button class="filter" data-thread-filter="ชีวิตนักศึกษา">ชีวิตนักศึกษา</button><button class="filter" data-thread-filter="ทุน/หอพัก">ทุน/หอพัก</button></div></div><div class="thread-list" id="threadList"><div class="thread-item" data-thread-category="เรื่องเรียน"><strong>วิชา Data Structure อาจารย์คนไหนสอนเข้าใจง่ายกว่ากันระหว่าง Sec 1 กับ Sec 2?</strong><small>วิศวกรรมศาสตร์ · 6 คำตอบ · อัปเดต 12 นาทีที่แล้ว</small></div><div class="thread-item" data-thread-category="ทุน/หอพัก"><strong>หอในกับหอนอกมหาลัยศรีราชา ต่างกันมากไหมสำหรับปี 1 ที่ยังไม่มีรถ?</strong><small>ทุน/หอพัก · 12 คำตอบ · อัปเดต 20 นาทีที่แล้ว</small></div><div class="thread-item" data-thread-category="เรื่องเรียน"><strong>โปรเจกต์กลุ่มวิชา Principle of Marketing เริ่มเก็บข้อมูลตอนไหน?</strong><small>วิทยาการจัดการ · 4 คำตอบ · อัปเดต 32 นาทีที่แล้ว</small></div><div class="thread-item" data-thread-category="ชีวิตนักศึกษา"><strong>มีที่นั่งอ่านหนังสือเงียบ ๆ แถวตึก SC ไหม?</strong><small>ชีวิตนักศึกษา · 3 คำตอบ · อัปเดต 45 นาทีที่แล้ว</small></div></div></div></div>
+<div class="modal-backdrop" id="myThreadsModal"><div class="modal page-modal"><button class="modal-close" data-close="myThreadsModal">×</button><div class="dashboard-head"><div><span class="faculty">MY COMMUNITY</span><h2>กระทู้ของฉัน</h2></div><button class="btn-primary" data-action="post">＋ ตั้งกระทู้</button></div><p class="modal-lead">กระทู้ที่คุณเผยแพร่จากบัญชีนี้</p><div class="thread-list" id="myThreadList"><div class="my-thread-empty">ยังไม่มีกระทู้ที่เผยแพร่<br><button class="btn-small" data-action="post" style="margin-top:12px">ตั้งกระทู้แรก</button></div></div></div></div>
+<div class="modal-backdrop" id="infoModal"><div class="modal wide"><button class="modal-close" data-close="infoModal">×</button><span class="faculty">POOTANG</span><h2 id="infoTitle">เกี่ยวกับเรา</h2><div class="info-copy" id="infoBody"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('#adCarousel .ad-slide'));
+  var dots = Array.prototype.slice.call(document.querySelectorAll('#adDots .ad-dot'));
+  var order = slides.map(function(_, i){ return i; });
+  var cart = [];
+  var isMember = false;
+  var subscriptionPlan = 'free';
+  var postsThisMonth = 0;
+  var myThreads = [];
+  var ownedArts = ['art-one'];
+  var ownedFrames = ['frame-none'];
+  var selectedPayment = 'truemoney';
+  function updateSubscriptionUI(){
+    var premium = subscriptionPlan === 'premium';
+    var linkField = document.getElementById('listingLink');
+    document.getElementById('dashboardPlan').textContent = premium ? 'Premium · ฿129/เดือน' : 'Free · ดูแพ็กเกจ →';
+    document.getElementById('dashboardQuota').textContent = premium ? 'ไม่จำกัด' : postsThisMonth + ' / 5 รายการ';
+    document.getElementById('dashboardQuotaBar').style.width = premium ? '100%' : Math.min(postsThisMonth / 5 * 100, 100) + '%';
+    document.getElementById('uploadPlanBadge').textContent = premium ? 'Premium' : 'Free';
+    linkField.disabled = !premium;
+    linkField.placeholder = premium ? 'https://... (Premium ใช้งานได้)' : 'ล็อกสำหรับ Free · อัปเกรด Premium เพื่อฝากลิงก์';
+    document.getElementById('listingTypeNote').textContent = premium ? 'Premium: ไม่จำกัดโควตา · ไฟล์ทุกชนิดและขนาด · ฝากลิงก์ Premium ได้' : 'Free: เหลือโควตา ' + Math.max(5 - postsThisMonth, 0) + ' รายการในเดือนนี้ · PDF ไม่เกิน 5MB · วิดีโอไม่เกิน 50MB · ห้ามใส่ลิงก์';
+  }
+  function renderAds(){
+    slides.forEach(function(el, idx){ el.className = 'ad-slide pos-' + order.indexOf(idx); });
+    dots.forEach(function(dot, idx){ dot.classList.toggle('active', order[0] === idx); });
+  }
+  function addMyThreadsButton(){
+    var header = document.querySelector('#allThreadsModal .dashboard-head');
+    var createButton = header && header.querySelector('[data-action="post"]');
+    if(!header || !createButton || header.querySelector('[data-action="my-threads"]')) return;
+    var myThreadsButton = document.createElement('button');
+    myThreadsButton.className = 'btn-secondary';
+    myThreadsButton.setAttribute('data-action', 'my-threads');
+    myThreadsButton.textContent = '📌 กระทู้ของฉัน';
+    createButton.parentNode.insertBefore(myThreadsButton, createButton);
+  }
+  renderAds();
+  addMyThreadsButton();
+  setInterval(function(){ order.push(order.shift()); renderAds(); }, 3000);
+
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+  function showToast(message){
+    var toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 2400);
+  }
+  function escapeHtml(value){ return value.replace(/[&<>"']/g, function(character){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[character]; }); }
+  function renderCart(){
+    var list = document.getElementById('cartItems');
+    var total = cart.reduce(function(sum, item){ return sum + item.price; }, 0);
+    document.getElementById('cartCount').textContent = cart.length;
+    document.getElementById('cartTotal').textContent = '฿' + total.toLocaleString('th-TH');
+    list.innerHTML = cart.length ? cart.map(function(item, index){ return '<div class="product-row"><div class="product-info"><strong>' + item.name + '</strong><small>รายการที่ ' + (index + 1) + ' · พร้อมดาวน์โหลดหลังชำระเงิน</small></div><span class="product-price">฿' + item.price + '</span><button class="btn-secondary" data-remove="' + index + '">ลบ</button></div>'; }).join('') : '<div class="empty-cart">ยังไม่มีสินค้าในตะกร้า</div>';
+  }
+  function addToCart(value){
+    if(!isMember){ openModal('authModal'); showToast('กรุณาลงทะเบียนหรือเข้าสู่ระบบก่อนเพิ่มสินค้า'); return; }
+    var parts = value.split('|'); cart.push({name:parts[0], price:Number(parts[1]), art:parts[2] || '', frame:parts[2] && parts[2].indexOf('frame-') === 0 ? parts[2] : ''}); renderCart(); showToast('เพิ่ม ' + parts[0] + ' ลงตะกร้าแล้ว');
+  }
+
+  document.addEventListener('click', function(event){
+    var action = event.target.closest('[data-action]');
+    var add = event.target.closest('[data-add]');
+    var art = event.target.closest('[data-avatar]');
+    var remove = event.target.closest('[data-remove]');
+    var close = event.target.closest('[data-close]');
+    if(art){
+      if(!isMember){ openModal('authModal'); showToast('กรุณาลงทะเบียนก่อนใช้รูปโปรไฟล์'); return; }
+      var artClass = art.getAttribute('data-avatar');
+      if(ownedArts.indexOf(artClass) === -1){ showToast('ต้องซื้ออาร์ตชิ้นนี้ก่อนจึงจะใช้ได้'); return; }
+      var profileAvatar = document.getElementById('profileAvatar');
+      profileAvatar.classList.remove('art-one','art-two','art-three'); profileAvatar.classList.add(artClass);
+      openModal('profileModal'); showToast('เลือกอาร์ตสำหรับโปรไฟล์แล้ว'); return;
+    }
+    if(add){ addToCart(add.getAttribute('data-add')); return; }
+    if(remove){ cart.splice(Number(remove.getAttribute('data-remove')), 1); renderCart(); return; }
+    if(close){ closeModal(close.getAttribute('data-close')); return; }
+    if(action){
+      var type = action.getAttribute('data-action');
+      if(type === 'info'){
+        event.preventDefault();
+        var info = {
+          about: ['เกี่ยวกับเรา', '<p>ปูทางคือพื้นที่กลางสำหรับรุ่นน้อง รุ่นพี่ และผู้สร้างสื่อการเรียนรู้ในมหาวิทยาลัยเกษตรศาสตร์ ศรีราชา</p><p>เราเชื่อว่าคำถามเล็ก ๆ และประสบการณ์จริงจากคนในมหาวิทยาลัยช่วยให้การเริ่มต้นชีวิตนักศึกษาง่ายขึ้น</p><p><strong>ข้อมูลติดต่อจำลอง</strong><br>อีเมล: hello@pootang.example<br>โทร: 02-000-0000<br>ที่อยู่: อาคารปูทาง ชั้น 2 ถนนสุขุมวิท กรุงเทพฯ 10110<br>เวลาทำการ: จันทร์-ศุกร์ 09:00-18:00 น.</p><small>ข้อมูลนี้จัดทำขึ้นเพื่อการสาธิตเท่านั้น</small>'],
+          rules: ['กติกาชุมชน', '<p>ช่วยกันทำให้ปูทางเป็นพื้นที่ที่ทุกคนกล้าถามและกล้าแบ่งปัน</p><ul><li>ใช้ถ้อยคำสุภาพและเคารพผู้อื่น</li><li>ห้ามเผยแพร่ข้อมูลส่วนตัวหรือเนื้อหาที่ละเมิดสิทธิ์</li><li>ตั้งกระทู้ให้ตรงหมวดหมู่และไม่สแปม</li><li>รายงานเนื้อหาที่ไม่เหมาะสมให้ทีมงานตรวจสอบ</li></ul>'],
+          seller: ['สำหรับรุ่นพี่แนะแนว', '<p>แบ่งปันชีท รูปโปรไฟล์ กรอบ หรือเปิดรับจองติวได้จากเมนู <strong>ลงขาย / เปิดรับจอง</strong></p><ul><li>ระบุรายละเอียด ราคา และเงื่อนไขให้ชัดเจน</li><li>ส่งมอบไฟล์หรือยืนยันรอบติวตามที่ประกาศ</li><li>ตรวจสอบแพ็กเกจ Free และ Premium ก่อนเผยแพร่</li></ul>'],
+          contact: ['ติดต่อเรา', '<p>ทีมงานปูทางพร้อมช่วยดูแลการใช้งานและรายการขาย</p><p>อีเมล: support@pootang.example<br>เวลาทำการ: จันทร์-ศุกร์ 09:00-18:00 น.</p>'],
+          terms: ['ข้อกำหนดการใช้งาน (T&C)', '<p>เมื่อใช้ปูทาง คุณยอมรับข้อกำหนดต่อไปนี้</p><ul><li>ผู้ใช้ต้องให้ข้อมูลที่ถูกต้องและรับผิดชอบบัญชีของตนเอง</li><li>ผู้ขายต้องเป็นเจ้าของหรือมีสิทธิ์เผยแพร่ไฟล์ รูปภาพ วิดีโอ และลิงก์ที่นำมาลงขาย</li><li>ห้ามขายเนื้อหาละเมิดลิขสิทธิ์ หลอกลวง สแปม หรือผิดกฎหมาย</li><li>ระบบอาจซ่อนหรือลบรายการที่ฝ่าฝืนกติกา และจำกัดบัญชีเมื่อจำเป็น</li><li>การชำระเงินในหน้านี้เป็นระบบจำลอง ยังไม่ใช่ธุรกรรมเงินจริง</li><li>แพ็กเกจ Premium ราคา ฿129/เดือน เป็นข้อมูลเดโม การใช้งานจริงต้องเชื่อม payment gateway และระบบสมาชิกก่อน</li></ul><p>ข้อกำหนดนี้อาจปรับปรุงเพื่อความปลอดภัยและความเหมาะสมของชุมชน</p>']
+        }[action.getAttribute('data-info')];
+        document.getElementById('infoTitle').textContent = info[0];
+        document.getElementById('infoBody').innerHTML = info[1];
+        openModal('infoModal'); return;
+      }
+      if(type === 'account-tools'){
+        var toolsPanel = document.getElementById('accountToolsPanel');
+        toolsPanel.classList.toggle('open'); action.classList.toggle('active'); return;
+      }
+      if(type === 'auth') openModal('authModal');
+      if(type === 'post') openModal('postModal');
+      if(type === 'browse') openModal('allThreadsModal');
+      if(type === 'market-all') openModal('allProductsModal');
+      if(type === 'my-threads'){
+        if(!isMember){ openModal('authModal'); showToast('กรุณาลงทะเบียนก่อนดูกระทู้ของฉัน'); return; }
+        openModal('myThreadsModal');
+      }
+      if(type === 'market') document.getElementById('market').scrollIntoView({behavior:'smooth', block:'start'});
+      if(type === 'account-status') openModal('accountStatusModal');
+      if(type === 'subscription'){ updateSubscriptionUI(); openModal('subscriptionModal'); }
+      if(type === 'subscribe-menu'){
+        if(!isMember){ openModal('authModal'); showToast('กรุณาลงทะเบียนก่อนสมัคร Premium'); return; }
+        updateSubscriptionUI(); openModal('subscriptionModal');
+      }
+      if(type === 'subscribe'){ subscriptionPlan = 'premium'; updateSubscriptionUI(); closeModal('subscriptionModal'); showToast('สมัคร Premium สำเร็จ ฿129/เดือน · ปลดล็อกสิทธิ์ทั้งหมดแล้ว'); }
+      if(type === 'profile'){
+        if(!isMember){ openModal('authModal'); showToast('กรุณาลงทะเบียนก่อนแก้ไขโปรไฟล์'); return; }
+        openModal('profileModal');
+      }
+      if(type === 'seller-upload'){
+        if(!isMember){ openModal('authModal'); showToast('กรุณาลงทะเบียนก่อนลงขายหรือเปิดรับจอง'); return; }
+        updateSubscriptionUI();
+        openModal('sellerUploadModal');
+      }
+      document.getElementById('accountToolsPanel').classList.remove('open'); document.querySelector('.account-tools-toggle').classList.remove('active');
+        if(type === 'cart'){
+          if(!isMember){ openModal('authModal'); showToast('กรุณาลงทะเบียนหรือเข้าสู่ระบบก่อนเปิดตะกร้า'); return; }
+          renderCart(); openModal('cartModal');
+        }
+      if(type === 'toast') showToast(action.getAttribute('data-message'));
+      if(type === 'checkout'){
+        if(!cart.length){ showToast('กรุณาเพิ่มสินค้าในตะกร้าก่อน'); return; }
+        document.getElementById('paymentTotal').textContent = document.getElementById('cartTotal').textContent;
+        closeModal('cartModal'); openModal('paymentModal');
+      }
+      if(type === 'pay'){
+        cart.forEach(function(item){ if(item.art && ownedArts.indexOf(item.art) === -1) ownedArts.push(item.art); });
+        cart.forEach(function(item){ if(item.frame && ownedFrames.indexOf(item.frame) === -1) ownedFrames.push(item.frame); });
+        closeModal('paymentModal'); cart = []; renderCart(); showToast('ชำระเงินสำเร็จ ระบบจำลองกำลังเตรียมไฟล์/ยืนยันรอบติว');
+      }
+      if(type === 'dashboard'){
+        var role = action.getAttribute('data-role');
+        document.getElementById('dashboardRole').textContent = role === 'seller' ? 'dashboard ผู้ขาย' : 'dashboard ผู้ตั้งกระทู้';
+        document.getElementById('kpiOne').textContent = role === 'seller' ? '฿4,820' : '126';
+        document.getElementById('kpiOneLabel').textContent = role === 'seller' ? 'รายได้เดือนนี้' : 'ผู้เข้าชมกระทู้';
+        document.getElementById('dashboardActivity').textContent = role === 'seller' ? 'มีผู้ซื้อชีท CHEM 201 เมื่อ 8 นาทีที่แล้ว · รอส่งไฟล์' : 'กระทู้ “หอในกับหอนอก” มีคำตอบใหม่เมื่อ 12 นาทีที่แล้ว';
+        openModal('dashboardModal');
+      }
+      return;
+    }
+    var filter = event.target.closest('[data-filter]');
+    if(filter){
+      var selected = filter.getAttribute('data-filter');
+      document.querySelectorAll('.filter').forEach(function(item){ item.classList.toggle('active', item === filter); });
+      document.querySelectorAll('.qa-card').forEach(function(card){ card.classList.toggle('is-hidden', selected !== 'ทั้งหมด' && card.getAttribute('data-category') !== selected); });
+      return;
+    }
+    var threadFilter = event.target.closest('[data-thread-filter]');
+    if(threadFilter){
+      var threadCategory = threadFilter.getAttribute('data-thread-filter');
+      document.querySelectorAll('[data-thread-filter]').forEach(function(item){ item.classList.toggle('active', item === threadFilter); });
+      document.querySelectorAll('.thread-item').forEach(function(item){ item.style.display = threadCategory === 'ทั้งหมด' || item.getAttribute('data-thread-category') === threadCategory ? 'block' : 'none'; });
+      return;
+    }
+    var thread = event.target.closest('.thread-item');
+    if(thread){ document.getElementById('readTitle').textContent = thread.querySelector('strong').textContent; closeModal('allThreadsModal'); openModal('readModal'); return; }
+    if(event.target.closest('.qa-card')){
+      document.getElementById('readTitle').textContent = event.target.closest('.qa-card').querySelector('.question').textContent;
+      openModal('readModal');
+    }
+  });
+  document.querySelectorAll('.payment-method').forEach(function(method){ method.addEventListener('click', function(){ selectedPayment = method.getAttribute('data-payment'); document.querySelectorAll('.payment-method').forEach(function(item){ item.classList.toggle('active', item === method); }); document.querySelectorAll('[data-payment-panel]').forEach(function(panel){ panel.classList.toggle('active', panel.getAttribute('data-payment-panel') === selectedPayment); }); }); });
+  document.querySelectorAll('[data-profile-avatar]').forEach(function(option){ option.addEventListener('click', function(){ var artClass = option.getAttribute('data-profile-avatar'); if(ownedArts.indexOf(artClass) === -1){ showToast('รูปนี้ยังไม่ได้ซื้อ'); return; } var profileAvatar = document.getElementById('profileAvatar'); profileAvatar.classList.remove('art-one','art-two','art-three'); profileAvatar.classList.add(artClass); document.querySelectorAll('.profile-option').forEach(function(item){ item.classList.toggle('active', item === option); }); }); });
+  document.querySelectorAll('[data-profile-frame]').forEach(function(option){ option.addEventListener('click', function(){ var frameClass = option.getAttribute('data-profile-frame'); if(ownedFrames.indexOf(frameClass) === -1){ showToast('กรอบนี้ยังไม่ได้ซื้อ'); return; } var profileAvatar = document.getElementById('profileAvatar'); profileAvatar.classList.remove('frame-one','frame-two','frame-three'); if(frameClass !== 'frame-none') profileAvatar.classList.add(frameClass); document.querySelectorAll('[data-profile-frame]').forEach(function(item){ item.classList.toggle('active', item === option); }); }); });
+  document.querySelectorAll('.modal-backdrop').forEach(function(backdrop){ backdrop.addEventListener('click', function(event){ if(event.target === backdrop) backdrop.classList.remove('open'); }); });
+  document.querySelectorAll('.auth-tab').forEach(function(tab){ tab.addEventListener('click', function(){ document.querySelectorAll('.auth-tab').forEach(function(item){ item.classList.remove('active'); }); tab.classList.add('active'); var register = tab.getAttribute('data-tab') === 'register'; document.querySelector('.register-only').style.display = register ? 'flex' : 'none'; document.querySelector('#authForm .btn-small').textContent = register ? 'สร้างบัญชี' : 'เข้าสู่ระบบ'; }); });
+  document.getElementById('authForm').addEventListener('submit', function(event){ event.preventDefault(); isMember = true; closeModal('authModal'); document.getElementById('dashboardStrip').classList.add('open'); document.querySelector('.account-tools-toggle').removeAttribute('disabled'); document.querySelector('.nav-cta').textContent = 'บัญชีของฉัน'; document.querySelector('.nav-cta').setAttribute('data-action','profile'); showToast('ลงทะเบียนสำเร็จ ยินดีต้อนรับสู่ปูทาง'); });
+  document.getElementById('profileForm').addEventListener('submit', function(event){ event.preventDefault(); document.getElementById('profileNamePreview').textContent = document.getElementById('profileName').value; closeModal('profileModal'); showToast('บันทึกชื่อ อีเมล รหัสผ่าน และรูปโปรไฟล์เรียบร้อยแล้ว'); });
+  document.getElementById('listingType').addEventListener('change', function(){ var tutor = this.value === 'ติวเตอร์'; document.querySelector('.tutor-only').style.display = tutor ? 'flex' : 'none'; document.getElementById('listingTypeNote').textContent = tutor ? 'ผู้สนใจจะเลือกเวลาจองจากรอบที่คุณประกาศ' : 'รายการจะอยู่ใน marketplace และส่งมอบหลังชำระเงินสำเร็จ'; });
+  document.getElementById('listingFile').addEventListener('change', function(){ var file = this.files[0]; document.getElementById('uploadPreview').textContent = file ? 'ไฟล์ที่เลือก: ' + file.name : 'ยังไม่ได้เลือกไฟล์ · ระบบเดโมจะแสดงรายการทันทีหลังเผยแพร่'; });
+  document.getElementById('listingDescription').addEventListener('input', function(){ this.value = this.value.replace(/\//g, ''); });
+  document.getElementById('sellerUploadForm').addEventListener('submit', function(event){
+    event.preventDefault();
+    document.getElementById('listingDescription').value = document.getElementById('listingDescription').value.replace(/\//g, '');
+    var selectedFile = document.getElementById('listingFile').files[0];
+    var link = document.getElementById('listingLink').value.trim();
+    if(subscriptionPlan === 'free' && postsThisMonth >= 5){ showToast('แพ็กเกจ Free ครบโควตา 5 รายการ/เดือนแล้ว'); return; }
+    if(subscriptionPlan === 'free' && link){ showToast('แพ็กเกจ Free ไม่อนุญาตให้แปะลิงก์ Premium · อัปเกรดแพ็กเกจได้ที่เมนูสมาชิก'); return; }
+    if(subscriptionPlan === 'free' && selectedFile){
+      var fileName = selectedFile.name.toLowerCase();
+      var sizeLimit = fileName.endsWith('.pdf') ? 5 * 1024 * 1024 : fileName.match(/\.(mp4|mov|avi|webm|mkv)$/) ? 50 * 1024 * 1024 : Infinity;
+      if(selectedFile.size > sizeLimit){ showToast(fileName.endsWith('.pdf') ? 'แพ็กเกจ Free จำกัด PDF ไม่เกิน 5MB' : 'แพ็กเกจ Free จำกัดวิดีโอไม่เกิน 50MB'); return; }
+    }
+    var title = document.getElementById('listingTitle').value;
+    var type = document.getElementById('listingType').value;
+    var price = Number(document.getElementById('listingPrice').value);
+    var description = document.getElementById('listingDescription').value;
+    var schedule = document.getElementById('listingSchedule').value;
+    var card = document.createElement('div'); card.className = 'art-card';
+    var preview = document.createElement('div'); preview.className = 'art-preview art-' + (type === 'ติวเตอร์' ? 'two' : 'one'); preview.textContent = type;
+    var heading = document.createElement('strong'); heading.textContent = title;
+    var detail = document.createElement('small'); detail.textContent = description + (schedule ? ' · รอบจอง: ' + schedule : '');
+    var foot = document.createElement('div'); foot.className = 'art-card-foot';
+    var amount = document.createElement('b'); amount.textContent = '฿' + price;
+    var add = document.createElement('button'); add.className = 'btn-small'; add.textContent = type === 'ติวเตอร์' ? 'จองคิว' : 'เพิ่มลงตะกร้า'; add.setAttribute('data-add', title + '|' + price);
+    foot.appendChild(amount); foot.appendChild(add); card.appendChild(preview); card.appendChild(heading); card.appendChild(detail); card.appendChild(foot);
+    document.getElementById('sellerListingGrid').prepend(card); document.getElementById('sellerListings').style.display = 'block'; closeModal('sellerUploadModal'); showToast('เผยแพร่ ' + title + ' ใน marketplace แล้ว'); this.reset(); document.getElementById('uploadPreview').textContent = 'ยังไม่ได้เลือกไฟล์ · ระบบเดโมจะแสดงรายการทันทีหลังเผยแพร่'; document.querySelector('.tutor-only').style.display = 'none';
+    postsThisMonth += 1; updateSubscriptionUI();
+  });
+  document.getElementById('postForm').addEventListener('submit', function(event){
+    event.preventDefault();
+    var title = this.querySelector('input').value.trim();
+    var category = this.querySelector('select').value;
+    var description = this.querySelector('textarea').value.trim();
+    myThreads.unshift({title:title, category:category, description:description});
+    var thread = document.createElement('div');
+    thread.className = 'thread-item'; thread.setAttribute('data-thread-category', category);
+    thread.innerHTML = '<strong>' + escapeHtml(title) + '</strong><small>' + escapeHtml(category) + ' · 0 คำตอบ · เพิ่งเผยแพร่</small>';
+    document.getElementById('threadList').prepend(thread);
+    var myThread = thread.cloneNode(true);
+    document.getElementById('myThreadList').querySelector('.my-thread-empty')?.remove();
+    document.getElementById('myThreadList').prepend(myThread);
+    var card = document.createElement('div');
+    card.className = 'qa-card'; card.setAttribute('data-category', category);
+    card.innerHTML = '<div class="top"><span class="faculty">' + escapeHtml(category) + '</span></div><div class="question">' + escapeHtml(title) + '</div><div class="answer-body">' + escapeHtml(description) + '</div><div class="card-foot"><span>💬 0 คำตอบ</span><span>เพิ่งเผยแพร่</span></div>';
+    document.querySelector('.qa-masonry').prepend(card);
+    closeModal('postModal'); showToast('เผยแพร่กระทู้แล้ว รุ่นพี่จะได้รับการแจ้งเตือน'); this.reset();
+  });
+  document.getElementById('threadSearch').addEventListener('input', function(){ var query = this.value.toLowerCase(); document.querySelectorAll('.thread-item').forEach(function(item){ item.style.display = item.textContent.toLowerCase().indexOf(query) !== -1 ? 'block' : 'none'; }); });
+  document.getElementById('carousel').addEventListener('wheel', function(event){
+    if(Math.abs(event.deltaY) > Math.abs(event.deltaX)){ event.preventDefault(); this.scrollLeft += event.deltaY; }
+  }, {passive:false});
+
+  document.querySelectorAll('.hero-photo, [style*="background-image"]').forEach(function(element){
+    var source = element.style.backgroundImage || window.getComputedStyle(element).backgroundImage;
+    var match = source.match(/url\(["']?(.*?)["']?\)/);
+    if(!match) return;
+    var image = new Image();
+    image.onerror = function(){ element.classList.add('image-fallback'); element.style.backgroundImage = ''; };
+    image.src = match[1];
+  });
+})();
+</script>
+</body>
+</html>
